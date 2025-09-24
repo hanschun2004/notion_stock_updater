@@ -1,13 +1,12 @@
-# 워크플로우의 이름 (자유롭게 지정 가능)
+# 워크플로우의 이름
 name: Update Notion ETF Prices
 
 # 이 워크플로우가 언제 실행될지를 정의합니다.
 on:
-  # 1. 스케줄 실행: cron 표현식을 사용하여 6시간마다 실행
-  #    (0 */6 * * * -> 매일 00:00, 06:00, 12:00, 18:00 경에 실행)
-  #    더 자주 실행하고 싶다면, */6를 */1 (1시간마다) 등으로 변경
+  # 1. 스케줄 실행: cron 표현식을 사용하여 1시간마다 실행
+  #    '0 * * * *' -> 매시 정각에 실행 (예: 01:00, 02:00, 03:00...)
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 * * * *"
 
   # 2. 수동 실행: GitHub의 Actions 탭에서 수동으로 실행할 수 있도록 버튼 추가
   workflow_dispatch:
@@ -38,7 +37,6 @@ jobs:
 
       # 4단계: 우리의 메인 파이썬 스크립트를 실행합니다!
       - name: Run Python script to update Notion
-        # 여기서 GitHub Secrets에 저장해둔 값들을 환경 변수로 주입합니다.
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           DATABASE_ID: ${{ secrets.DATABASE_ID }}
