@@ -1,0 +1,45 @@
+# 워크플로우의 이름 (자유롭게 지정 가능)
+name: Update Notion ETF Prices
+
+# 이 워크플로우가 언제 실행될지를 정의합니다.
+on:
+  # 1. 스케줄 실행: cron 표현식을 사용하여 6시간마다 실행
+  #    (0 */6 * * * -> 매일 00:00, 06:00, 12:00, 18:00 경에 실행)
+  #    더 자주 실행하고 싶다면, */6를 */1 (1시간마다) 등으로 변경
+  schedule:
+    - cron: "0 */6 * * *"
+
+  # 2. 수동 실행: GitHub의 Actions 탭에서 수동으로 실행할 수 있도록 버튼 추가
+  workflow_dispatch:
+
+# 실제 실행될 작업(Job)들을 정의합니다.
+jobs:
+  update-prices:
+    # 이 작업이 실행될 가상 환경을 지정합니다 (Ubuntu 최신 버전)
+    runs-on: ubuntu-latest
+
+    # 작업의 단계(Step)들을 순서대로 정의합니다.
+    steps:
+      # 1단계: GitHub 저장소의 코드를 가상 환경으로 가져옵니다.
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2단계: Python 3.9 버전을 설치합니다.
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      # 3단계: 파이썬 라이브러리(requests, beautifulsoup4)를 설치합니다.
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4단계: 우리의 메인 파이썬 스크립트를 실행합니다!
+      - name: Run Python script to update Notion
+        # 여기서 GitHub Secrets에 저장해둔 값들을 환경 변수로 주입합니다.
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          DATABASE_ID: ${{ secrets.DATABASE_ID }}
+        run: python main.py
