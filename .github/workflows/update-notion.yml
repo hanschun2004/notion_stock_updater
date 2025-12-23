@@ -1,8 +1,13 @@
+# 워크플로우의 이름
 name: Update Notion ETF Prices
 
+# 이 워크플로우가 언제 실행될지를 정의합니다.
 on:
+  # 1. 스케줄 실행: 매시 정각에 실행
   schedule:
     - cron: "0 * * * *"
+
+  # 2. 수동 실행: GitHub의 Actions 탭에서 수동으로 실행 버튼 추가
   workflow_dispatch:
 
 jobs:
@@ -10,24 +15,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1단계: 코드를 가져옵니다. (기본 위치는 저장소 루트입니다)
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2단계: Python 3.9 설치
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      # requirements.txt가 있는 폴더로 들어가서 설치합니다.
+      # 3단계: 라이브러리 설치
+      # 깃허브 저장소 루트에 있는 requirements.txt를 바로 읽습니다.
       - name: Install dependencies
-        working-directory: ./notion_stock_updater
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # main.py가 있는 폴더로 들어가서 실행합니다.
-      - name: Run Python script
-        working-directory: ./notion_stock_updater
+      # 4단계: 파이썬 스크립트 실행
+      # 깃허브 저장소 루트에 있는 main.py를 바로 실행합니다.
+      - name: Run Python script to update Notion
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           DATABASE_ID: ${{ secrets.DATABASE_ID }}
